@@ -11,27 +11,25 @@ velocity = []
 ballShot = []
 
 with open(file, "r",errors='ignore') as f: 
-            for lineNumber, readLine in enumerate(f,1):
-                if lineNumber == 1:
-                    continue
-                readLine = readLine.rstrip()
-                myList = readLine.split(",")
-                #for i,l in enumerate(myList):
-                    #Timestamp,Set Power,Current,Running,Ticks,Velocity,Ball Shot
-                    #000.842,0.000,0.000,false,-283396.000,-0.000,false
-                timeStamp.append(float(myList[0]))
-                setPower.append(float(myList[1]))
-                current.append(float(myList[2]))
-                if(myList[3] == 'true'):
-                    running.append(True)
-                else:
-                    running.append(False)
-                ticks.append(float(myList[4]))
-                velocity.append(-float(myList[5]))
-                if(myList[6] == 'true'):
-                    ballShot.append(True)
-                else:
-                    ballShot.append(False)
+    for lineNumber, readLine in enumerate(f,1):
+        if lineNumber == 1:
+            continue
+        readLine = readLine.rstrip()
+        myList = readLine.split(",")
+
+        timeStamp.append(float(myList[0]))
+        setPower.append(float(myList[1]))
+        current.append(float(myList[2]))
+        if(myList[3] == 'true'):
+            running.append(True)
+        else:
+            running.append(False)
+        ticks.append(float(myList[4]))
+        velocity.append(-float(myList[5]))
+        if(myList[6] == 'true'):
+            ballShot.append(True)
+        else:
+            ballShot.append(False)
 
 
 fig, ax1 = plt.subplots(layout='constrained',dpi=300)
