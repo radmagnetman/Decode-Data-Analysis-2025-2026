@@ -1,6 +1,6 @@
 import matplotlib.pyplot as plt
 
-file = r"datalogs\\shooterTester_20250920-105917.csv"
+file = r"datalogs\\20250920 Initial shooting tests\\shooterTester_20250920-105917.csv"
 
 timeStamp = []
 setPower = []
