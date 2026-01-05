@@ -7,9 +7,11 @@ import glob
 # relevant info to pull files. First line is the timestamp for the file name,
 # second line is the indexes in the individual files to plot, third line is label
 # to help identify on graph
-lookingAt = ['151929','152542','154040']
-timeBox = [[187.1,210],[36,45],[66.9,72]]
-desc = ['30','40','50']
+lookingAt = ['150856','151929','152542','154040']
+#lookingAt =['154509']
+timeBox = [[89.5,95],[187.1,210],[36,45],[66.9,72]]
+#timeBox = [[0,10000]]
+desc = ['20','30','40','50']
 
 # get all csv files
 dataPath = 'bionic-shooter-pid-tuning\\'
@@ -38,14 +40,26 @@ for i, f in enumerate(lookingAt):
     dfRunning = df.loc[(df["Running"] == True) & (df["Timestamp"] > timeBox[i][0]) & (df["Timestamp"] < timeBox[i][1])]
     t = dfRunning["Timestamp"]
     t0 = float(t.iloc[0])
+    #t0=0
     tplt = []
     for j in range(t.shape[0]):
         tplt.append( float(t.iloc[j] - t0))
+
     velocity = dfRunning["Velocity"]
     current = dfRunning["Current"]
 
+
+    # create running average of 10 values to smooth data.
+    velocityAvg = []
+    avgArray = [0,0,0,0,0]#,0,0,0,0,0]
+    for v in velocity:
+        avgArray.pop()
+        avgArray.insert(0, v)
+        velocityAvg.append(float(np.average(avgArray)))
+
+
     # plot
-    ax1[0].plot(tplt, velocity,label=desc[i])
+    ax1[0].plot(tplt, velocityAvg,label=desc[i])
     ax1[1].plot(tplt, current)
 
 fig.suptitle('target 1200 ticks/rev')
@@ -53,6 +67,7 @@ ax1[0].set_ylabel('Velocity')
 ax1[0].legend()
 ax1[1].set_ylabel('Current')
 ax1[1].set_xlabel('Time (sec)')
-ax1[0].set_xlim(0,5)
-ax1[1].set_xlim(0,5)
+#ax1[0].set_xlim(0,5)
+#ax1[1].set_xlim(0,5)
+ax1[0].set_ylim(900,1400)
 fig.savefig('target_1200_all_time')
