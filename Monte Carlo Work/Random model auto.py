@@ -81,7 +81,8 @@ def randomPattern():
     
     return pattern
 
-def createShot(shot, **kwargs):
+def createShot(thisShot, **kwargs):
+    # print('func: ' + thisShot[0]+thisShot[1]+thisShot[2])
     probHit = [1,1,1]
     probFlip = 0
     for key, value in kwargs.items():
@@ -93,48 +94,48 @@ def createShot(shot, **kwargs):
             print("Invalid argument: %s" % (key))
             sys.exit(1)
     
-    if len(shot) != 3:
-        print('Shots consist of 3 values: %d were given' % (len(shot)))
+    if len(thisShot) != 3:
+        print('Shots consist of 3 values: %d were given' % (len(thisShot)))
         sys.exit(1)
     
-    if shot.count('e') > 0:
+    if thisShot.count('e') > 0:
         print('Empty ball in shot')
         sys.exit(1)
     
-    for i in range(len(shot)):
+    for i in range(len(thisShot)):
         num = random.random()
         if num > probHit[i]:
-            shot[i] = 'e'
+            thisShot[i] = 'e'
     
-    if shot[0] == 'e':
-        shot[0] = shot[1]
-        shot[1] = shot[2]
-        shot[2] = 'e'
+    if thisShot[0] == 'e':
+        thisShot[0] = thisShot[1]
+        thisShot[1] = thisShot[2]
+        thisShot[2] = 'e'
     
-    if shot[1] == 'e':
-        shot[1] = shot[2]
-        shot[2] = 'e'
+    if thisShot[1] == 'e':
+        thisShot[1] = thisShot[2]
+        thisShot[2] = 'e'
         
     if random.random() < probFlip:
-        temp = shot[0]
-        shot[0] = shot[1]
-        shot[1] = temp
+        temp = thisShot[0]
+        thisShot[0] = thisShot[1]
+        thisShot[1] = temp
 
     if random.random() < probFlip:
-        temp = shot[1]
-        shot[1] = shot[2]
-        shot[2] = temp
+        temp = thisShot[1]
+        thisShot[1] = thisShot[2]
+        thisShot[2] = temp
 
-    if shot[0] == 'e':
-        shot[0] = shot[1]
-        shot[1] = shot[2]
-        shot[2] = 'e'
+    if thisShot[0] == 'e':
+        thisShot[0] = thisShot[1]
+        thisShot[1] = thisShot[2]
+        thisShot[2] = 'e'
     
-    if shot[1] == 'e':
-        shot[1] = shot[2]
-        shot[2] = 'e'
+    if thisShot[1] == 'e':
+        thisShot[1] = thisShot[2]
+        thisShot[2] = 'e'
     
-    return shot
+    return thisShot
     
 
 # grab ball's pos 0 -> 2
@@ -144,72 +145,117 @@ fieldLoc2 = ['p','g','p']
 fieldLoc3 = ['p','p','g']
 corner = ['p','g','p']
 
-probToFlip = .1
-probToHit = [.9,.9,.9]
-runningScore = []
-runningMatches = []
-for i in range(5):
+#---- Full match
+probToFlip = 0
+probToHit = [1,1,1]
+
+runningAutoScore = []
+runningAutoMatches = []
+
+runningTeleopScore = []
+runningTeleopMatches = []
+
+runningTotalScore = []
+runningTotalMatches = []
+
+for i in range(10000):
     score = 0
     p = randomPattern()
     c = classifier(p)
-    sortedShot = p[0:3]
-    score += c.addShot(createShot(sortedShot,probFlip = probToFlip,probHit = probToHit))
-    score += c.addShot(createShot(sortedShot,probFlip = probToFlip,probHit = probToHit))
-    score += c.addShot(createShot(sortedShot,probFlip = probToFlip,probHit = probToHit))
+
+    currentLoad = ['g','p','p']
+    shot1 = createShot(currentLoad,probFlip = probToFlip,probHit = probToHit)
+    score += c.addShot(shot1)
+
+    c.openGate()
+
+    currentLoad = ['g','p','p']
+    shot2 = createShot(currentLoad,probFlip = probToFlip,probHit = probToHit)
+    score += c.addShot(shot2)
+
+    currentLoad = ['p','g','p']
+    shot3 = createShot(currentLoad,probFlip = probToFlip,probHit = probToHit)
+    score += c.addShot(shot2)
+
+    currentLoad = ['p','p','g']
+    shot4 = createShot(currentLoad,probFlip = probToFlip,probHit = probToHit)
+    score += c.addShot(shot2)
+
     score += c.classifyBonus()
-    runningScore.append(score)
-    runningMatches.append(c.returnNumMatches())
+    runningAutoScore.append(score)
+    runningAutoMatches.append(c.returnNumMatches())
 
-c.printClassifier()
-print('  Avg score: %0.1f +/- %0.1f' % (statistics.mean(runningScore),statistics.stdev(runningScore)))
-print('Num matches: %0.1f +/- %0.1f' % (statistics.mean(runningMatches),statistics.stdev(runningMatches)))
+    score = 0
+    
+    c.openGate()
 
-# numLoops = 10000
-# scoreTotal = []
-# matchTotal = []
+    for j in range(9):
+        shot = createShot(['p','p','g'],probFlip = probToFlip,probHit = probToHit)
+        score += c.addShot(shot)
+        if (j+1) % 3 == 0:
+            c.openGate()
+    
 
-# probToHit = [.7,.9,.8]
+    shot = createShot(['p','p','p'],probFlip = probToFlip,probHit = probToHit)
+    score += c.addShot(shot)
+    
+    shot = createShot(['p','p','p'],probFlip = probToFlip,probHit = probToHit)
+    score += c.addShot(shot)
+    
+    shot = createShot(['p','p','p'],probFlip = probToFlip,probHit = probToHit)
+    score += c.addShot(shot)
+    
+    score += c.classifyBonus()
+    runningTeleopScore.append(score)
+    runningTeleopMatches.append(c.returnNumMatches())
+
+    runningTotalScore.append(runningAutoScore[-1] + runningTeleopScore[-1])
+    runningTotalMatches.append(runningAutoMatches[-1] + runningTeleopMatches[-1])
+        
+
+    
+
+
+print('-----')
+print('   Avg auto score: %0.1f +/- %0.1f' % (statistics.mean(runningAutoScore),statistics.stdev(runningAutoScore)))
+print(' Num auto matches: %0.1f +/- %0.1f' % (statistics.mean(runningAutoMatches),statistics.stdev(runningAutoMatches)))
+print('   Avg tele score: %0.1f +/- %0.1f' % (statistics.mean(runningTeleopScore),statistics.stdev(runningTeleopScore)))
+print(' Num tele matches: %0.1f +/- %0.1f' % (statistics.mean(runningTeleopMatches),statistics.stdev(runningTeleopMatches)))
+print('  Avg total score: %0.1f +/- %0.1f' % (statistics.mean(runningTotalScore),statistics.stdev(runningTotalScore)))
+print('Num total matches: %0.1f +/- %0.1f' % (statistics.mean(runningTotalMatches),statistics.stdev(runningTotalMatches)))
+
+
+#---- Sorting Auto
 # probToFlip = 0
-
-# for i in range(numLoops):
-#     currentScore = score(randomPattern())
-#     currentScore.addShot(['g','p','p'])
-#     currentScore.openGate()
-#     currentScore.addShot(createShot(['g','p','p'],probFlip = probToFlip,probHit = probToHit))
-#     currentScore.addShot(createShot(['p','g','p'],probFlip = probToFlip,probHit = probToHit))
-#     currentScore.addShot(createShot(['p','p','g'],probFlip = probToFlip,probHit = probToHit))
-#     numMatchesInAuto = currentScore.returnNumMatches()
-#     currentScore.addClassifiyBonus()
-#     currentScore.openGate()
+# probToHit = [1,1,1]
+# runningScore = []
+# runningMatches = []
+# for i in range(10000):
+#     score = 0
+#     p = randomPattern()
+#     c = classifier(p)
     
-#     for j in range(5):
-#         currentScore.addShot(createShot(['p','g','p'],probFlip = probToFlip,probHit = probToHit))
-#         currentScore.addShot(createShot(['p','g','p'],probFlip = probToFlip,probHit = probToHit))
-#         currentScore.addShot(createShot(['p','g','p'],probFlip = probToFlip,probHit = probToHit))
-#         currentScore.openGate()
+#     sortedShot = p[0:3]
+#     shot1 = createShot(sortedShot,probFlip = probToFlip,probHit = probToHit)
+
+#     sortedShot = p[0:3]
+#     shot2 = createShot(sortedShot,probFlip = probToFlip,probHit = probToHit)
     
-#     currentScore.addShot(createShot(['p','p','p'],probFlip = probToFlip,probHit = probToHit))
-#     currentScore.addShot(createShot(['p','p','p'],probFlip = probToFlip,probHit = probToHit))
-#     currentScore.addShot(createShot(['p','p','p'],probFlip = probToFlip,probHit = probToHit))
-#     currentScore.addClassifiyBonus()
+#     sortedShot = p[0:3]
+#     shot3 = createShot(sortedShot,probFlip = probToFlip,probHit = probToHit)
 
+#     score += c.addShot(shot1)
+#     score += c.addShot(shot2)
+#     score += c.addShot(shot3)
+#     # score += c.addShot(createShot(sortedShot,probFlip = probToFlip,probHit = probToHit))
 
-#     scoreTotal.append(currentScore.returnScore(True))
-#     matchTotal.append(currentScore.returnNumMatches()+numMatchesInAuto)
+#     score += c.classifyBonus()
+#     runningScore.append(score)
+#     runningMatches.append(c.returnNumMatches())
 
+# print('-----')
+# print('  Avg score: %0.1f +/- %0.1f' % (statistics.mean(runningScore),statistics.stdev(runningScore)))
+# print('Num matches: %0.1f +/- %0.1f' % (statistics.mean(runningMatches),statistics.stdev(runningMatches)))
 
-# print('  Avg score: %0.1f +/- %0.1f' % (statistics.mean(scoreTotal),statistics.stdev(scoreTotal)))
-# print('Num matches: %0.1f +/- %0.1f' % (statistics.mean(matchTotal),statistics.stdev(matchTotal)))
-
-# #currentScore.printClassifier()
-# #print('  Score: %d' % (currentScore.returnScore(True)))
-# #print('Matches: %d' % (currentScore.returnNumMatches()))
-
-
-# # Situation 1, grab field loc 1, 2, 3, empty, grab corner
-
-# # for i in range(10000):
-# #     score = 0
-# #     thisPattern = randomPattern()
 
 
