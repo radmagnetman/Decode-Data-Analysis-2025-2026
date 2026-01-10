@@ -137,16 +137,15 @@ def createShot(thisShot, **kwargs):
     
     return thisShot
     
-
-# grab ball's pos 0 -> 2
-preload = ['g','p','p']
-fieldLoc1 = ['g','p','p']
-fieldLoc2 = ['p','g','p']
-fieldLoc3 = ['p','p','g']
-corner = ['p','g','p']
+def returnRandomBall(*args):
+        
+    if random.random() < (2/3):
+        return 'p'
+    else:
+        return 'g'
 
 #---- Full match
-probToFlip = 0
+probToFlip = 0.1
 probToHit = [1,1,1]
 
 runningAutoScore = []
@@ -163,23 +162,19 @@ for i in range(10000):
     p = randomPattern()
     c = classifier(p)
 
-    currentLoad = ['g','p','p']
-    shot1 = createShot(currentLoad,probFlip = probToFlip,probHit = probToHit)
+    shot1 = createShot(['g','p','p'],probFlip = probToFlip,probHit = probToHit)
     score += c.addShot(shot1)
 
     c.openGate()
 
-    currentLoad = ['g','p','p']
-    shot2 = createShot(currentLoad,probFlip = probToFlip,probHit = probToHit)
+    shot2 = createShot(['g','p','p'],probFlip = probToFlip,probHit = probToHit)
     score += c.addShot(shot2)
 
-    currentLoad = ['p','g','p']
-    shot3 = createShot(currentLoad,probFlip = probToFlip,probHit = probToHit)
-    score += c.addShot(shot2)
+    shot3 = createShot(['p','g','p'],probFlip = probToFlip,probHit = probToHit)
+    score += c.addShot(shot3)
 
-    currentLoad = ['p','p','g']
-    shot4 = createShot(currentLoad,probFlip = probToFlip,probHit = probToHit)
-    score += c.addShot(shot2)
+    shot4 = createShot(['p','p','g'],probFlip = probToFlip,probHit = probToHit)
+    score += c.addShot(shot4)
 
     score += c.classifyBonus()
     runningAutoScore.append(score)
@@ -189,20 +184,26 @@ for i in range(10000):
     
     c.openGate()
 
-    for j in range(9):
+    for j in range(10):
         shot = createShot(['p','p','g'],probFlip = probToFlip,probHit = probToHit)
         score += c.addShot(shot)
         if (j+1) % 3 == 0:
             c.openGate()
     
 
-    shot = createShot(['p','p','p'],probFlip = probToFlip,probHit = probToHit)
+    # shot = createShot([returnRandomBall(),returnRandomBall(),returnRandomBall()],probFlip = probToFlip,probHit = probToHit)
+    # shot = createShot(['p','p','p'],probFlip = probToFlip,probHit = probToHit)
+    shot = createShot([p[0],p[1],p[2]],probFlip = probToFlip,probHit = probToHit)
     score += c.addShot(shot)
     
-    shot = createShot(['p','p','p'],probFlip = probToFlip,probHit = probToHit)
+    # shot = createShot([returnRandomBall(),returnRandomBall(),returnRandomBall()],probFlip = probToFlip,probHit = probToHit)
+    # shot = createShot(['p','p','p'],probFlip = probToFlip,probHit = probToHit)
+    shot = createShot([p[0],p[1],p[2]],probFlip = probToFlip,probHit = probToHit)
     score += c.addShot(shot)
     
-    shot = createShot(['p','p','p'],probFlip = probToFlip,probHit = probToHit)
+    # shot = createShot([returnRandomBall(),returnRandomBall(),returnRandomBall()],probFlip = probToFlip,probHit = probToHit)
+    # shot = createShot(['p','p','p'],probFlip = probToFlip,probHit = probToHit)
+    shot = createShot([p[0],p[1],p[2]],probFlip = probToFlip,probHit = probToHit)
     score += c.addShot(shot)
     
     score += c.classifyBonus()
