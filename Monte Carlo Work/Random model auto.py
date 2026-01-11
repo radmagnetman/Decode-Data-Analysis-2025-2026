@@ -4,6 +4,10 @@ import sys
 import statistics
 
 class classifier:
+    # classifier object,
+    # contains members for the classifier (index 0 indicates ball closest to gate) and input pattern
+    # classifier list members can be 'e' for empty, 'p' for purple, and 'g' for green
+    # firstEmpty is to assit in quickly finding the end of the stack of balls in the classifier member
     def __init__(self,inputPattern):
         #self.currentScore = 0
         self.classifier = ['e','e','e','e','e','e','e','e','e']
@@ -82,7 +86,6 @@ def randomPattern():
     return pattern
 
 def createShot(thisShot, **kwargs):
-    # print('func: ' + thisShot[0]+thisShot[1]+thisShot[2])
     probHit = [1,1,1]
     probFlip = 0
     for key, value in kwargs.items():
@@ -145,7 +148,7 @@ def returnRandomBall(*args):
         return 'g'
 
 #---- Full match
-probToFlip = 0.1
+probToFlip = 0.6
 probToHit = [1,1,1]
 
 runningAutoScore = []
@@ -167,13 +170,13 @@ for i in range(10000):
 
     c.openGate()
 
-    shot2 = createShot(['g','p','p'],probFlip = probToFlip,probHit = probToHit)
+    shot2 = createShot(['p','p','g'],probFlip = probToFlip,probHit = probToHit)
     score += c.addShot(shot2)
 
     shot3 = createShot(['p','g','p'],probFlip = probToFlip,probHit = probToHit)
     score += c.addShot(shot3)
 
-    shot4 = createShot(['p','p','g'],probFlip = probToFlip,probHit = probToHit)
+    shot4 = createShot(['g','p','p'],probFlip = probToFlip,probHit = probToHit)
     score += c.addShot(shot4)
 
     score += c.classifyBonus()
@@ -184,7 +187,7 @@ for i in range(10000):
     
     c.openGate()
 
-    for j in range(10):
+    for j in range(14):
         shot = createShot(['p','p','g'],probFlip = probToFlip,probHit = probToHit)
         score += c.addShot(shot)
         if (j+1) % 3 == 0:
